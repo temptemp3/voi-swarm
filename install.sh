@@ -158,6 +158,9 @@ start_stack() {
     "participation")
       docker_file="${voi_home}/docker/compose.yml"
       ;;
+    "conduit")
+      docker_file="${voi_home}/docker/conduit.yml"
+      ;;
     *)
       abort "Invalid profile. Exiting the program."
       ;;
@@ -233,6 +236,9 @@ function get_container_id() {
       ;;
     "archiver")
       container_id=$(docker ps -q -f name=voinetwork_archiver)
+      ;;
+    "conduit")
+      container_id=$(docker ps -q -f name=voinetwork_conduit)
       ;;
     "participation")
       container_id=$(docker ps -q -f name=voinetwork_algod)
@@ -846,7 +852,7 @@ set_telemetry_name() {
   if [[ ${VOINETWORK_PROFILE} == "relay" && -z ${VOINETWORK_TELEMETRY_NAME} ]]; then
     set_relay_name
     return
-  elif [[ ${VOINETWORK_PROFILE} == "developer" || ${VOINETWORK_PROFILE} == "archiver" ]]; then
+  elif [[ ${VOINETWORK_PROFILE} == "developer" || ${VOINETWORK_PROFILE} == "archiver" || ${VOINETWORK_PROFILE} == "conduit" ]]; then
     return
   fi
 
@@ -915,7 +921,7 @@ migrate_host_based_voi_setup() {
 }
 
 check_minimum_requirements() {
-  if [[ ${headless_install} -eq 1 || ${VOINETWORK_PROFILE} == "developer" || ${VOINETWORK_PROFILE} == "archiver" ]]; then
+  if [[ ${headless_install} -eq 1 || ${VOINETWORK_PROFILE} == "developer" || ${VOINETWORK_PROFILE} == "archiver" || ${VOINETWORK_PROFILE} == "conduit" ]]; then
     ## Allow headless install to skip telemetry name setup in case people bring their own wallets / use CI
     return
   fi
@@ -1032,6 +1038,7 @@ get_tarball() {
   rm "${voi_home}"/voi-swarm.tar.gz
 }
 
+# This is currently broken and unused, and should be fixed in the future
 preserve_autoupdate() {
     if [[ ${VOINETWORK_PROFILE} == "relay" ]]; then
       docker_filename="${voi_home}/docker/relay.yml"
@@ -1039,6 +1046,8 @@ preserve_autoupdate() {
       docker_filename="${voi_home}/docker/developer.yml"
     elif [[ ${VOINETWORK_PROFILE} == "archiver" ]]; then
       docker_filename="${voi_home}/docker/archiver.yml"
+    elif [[ ${VOINETWORK_PROFILE} == "conduit" ]]; then
+      docker_filename="${voi_home}/docker/conduit.yml"
     else
       docker_filename="${voi_home}/docker/compose.yml"
     fi
@@ -1051,6 +1060,7 @@ preserve_autoupdate() {
 }
 
 add_update_jitter() {
+  # TODO: Refactor to get filename as an argument / global state
   case ${VOINETWORK_PROFILE} in
     "relay")
       schedule_filename="${voi_home}/docker/relay.yml"
@@ -1060,6 +1070,9 @@ add_update_jitter() {
       ;;
     "archiver")
       schedule_filename="${voi_home}/docker/archiver.yml"
+      ;;
+    "conduit")
+      schedule_filename="${voi_home}/docker/conduit.yml"
       ;;
     "participation")
       schedule_filename="${voi_home}/docker/compose.yml"
