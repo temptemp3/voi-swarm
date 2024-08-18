@@ -27,6 +27,9 @@ function util_get_container_id() {
     "participation")
       CONTAINER_ID=$(docker ps -q -f name=voinetwork_algod)
       ;;
+    "conduit")
+      CONTAINER_ID=$(docker ps -q -f name=voinetwork_conduit)
+      ;;
     *)
       util_abort "Invalid profile. Exiting the program."
       ;;
@@ -71,6 +74,9 @@ function util_start_stack() {
       ;;
     "archiver")
       composeFile="${HOME}/voi/docker/archiver.yml"
+      ;;
+    "conduit")
+      composeFile="${HOME}/voi/docker/conduit.yml"
       ;;
     "participation")
       composeFile="${HOME}/voi/docker/compose.yml"
